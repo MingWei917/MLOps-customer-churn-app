@@ -13,13 +13,17 @@ jobs:
   mlops-pipeline:
     runs-on: ubuntu-latest
     
-    # These secrets are automatically injected by MLOps-infra
+    # DagsHub Secrets injected by MLOps-infra
     env:
+      # MLflow Tracking Credentials
       MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
-      MINIO_S3_ENDPOINT: ${{ secrets.MINIO_S3_ENDPOINT }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.MINIO_ROOT_USER }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.MINIO_ROOT_PASSWORD }}
-      AWS_DEFAULT_REGION: us-east-1
+      MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+      
+      # DVC S3-Compatible Storage Credentials
+      DVC_S3_ENDPOINT_URL: ${{ secrets.DVC_S3_ENDPOINT_URL }}
+      DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+      DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
 
     steps:
       - name: Checkout Code
@@ -44,31 +48,27 @@ jobs:
           pip install -r requirements.txt
           pip install "dvc[s3]" mlflow
 
-      - name: Configure DVC Remote (MinIO)
+      - name: Configure DVC Remote (DagsHub)
         run: |
-          # Add remote (force overwrite if exists locally)
-          dvc remote add -f minio_remote s3://mlops-artifacts
-          dvc remote default minio_remote
+          # Add DagsHub S3 remote (bucket name matches your repo name)
+          dvc remote add -f origin s3://MLOps-customer-churn-app
+          dvc remote default origin
           
-          # Inject MinIO credentials from MLOps-infra secrets
-          dvc remote modify minio_remote endpointurl $MINIO_S3_ENDPOINT
-          dvc remote modify minio_remote access_key_id $AWS_ACCESS_KEY_ID
-          dvc remote modify minio_remote secret_access_key $AWS_SECRET_ACCESS_KEY
-          dvc remote modify minio_remote use_ssl false
+          # Inject DagsHub S3-compatible credentials
+          dvc remote modify origin endpointurl $DVC_S3_ENDPOINT_URL
+          dvc remote modify origin access_key_id $DAGSHUB_USERNAME
+          dvc remote modify origin secret_access_key $DAGSHUB_TOKEN
 
-      - name: Ensure MinIO Bucket Exists
-        run: |
-          # Create the bucket if it doesn't exist yet (idempotent)
-          aws s3 mb s3://mlops-artifacts --endpoint-url $MINIO_S3_ENDPOINT || echo "Bucket already exists"
+      # DagsHub automatically provisions the S3 bucket when the repo is created.
 
-      - name: Pull Data & Artifacts from MinIO
+      - name: Pull Data & Artifacts from DagsHub
         run: dvc pull
 
       - name: Run DVC Pipeline (Ingest, Train, Evaluate)
-        # This executes the stages defined in your dvc.yaml
+        # The MLFLOW_TRACKING_* env vars are automatically picked up by the MLflow Python SDK
         run: dvc repro 
 
-      - name: Push Updated Models & Metrics to MinIO
+      - name: Push Updated Models & Metrics to DagsHub
         # Only push back to storage if we are on the main branch (not on PRs)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: dvc push
