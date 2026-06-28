@@ -50,14 +50,16 @@ jobs:
 
       - name: Configure DVC Remote (DagsHub)
         run: |
-          # Add DagsHub S3 remote (bucket name matches your repo name)
-          dvc remote add -f origin s3://MLOps-customer-churn-app
+          # DagsHub requires the bucket name to ALWAYS be 'dvc'
+          dvc remote add -f origin s3://dvc
           dvc remote default origin
           
-          # Inject DagsHub S3-compatible credentials
+          # Set the endpoint URL from your GitHub secrets
           dvc remote modify origin endpointurl $DVC_S3_ENDPOINT_URL
-          dvc remote modify origin access_key_id $DAGSHUB_TOKEN
-          dvc remote modify origin secret_access_key $DAGSHUB_TOKEN
+          
+          # Inject DagsHub credentials securely into the local config
+          dvc remote modify origin --local access_key_id $DAGSHUB_TOKEN
+          dvc remote modify origin --local secret_access_key $DAGSHUB_TOKEN
 
       # DagsHub automatically provisions the S3 bucket when the repo is created.
 
