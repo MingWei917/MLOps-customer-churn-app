@@ -115,11 +115,11 @@ def main():
 
         mlflow.log_metrics(metrics)
 
-        # mlflow.sklearn.log_model(
-        #     sk_model=pipeline,
-        #     artifact_path="model",
-        #     registered_model_name="customer_churn_model"
-        # )
+        mlflow.sklearn.log_model(
+            sk_model=pipeline,
+            artifact_path="model",
+            registered_model_name="customer_churn_model"
+        )
 
         Path("models").mkdir(exist_ok=True)
         Path("metrics").mkdir(exist_ok=True)
