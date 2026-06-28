@@ -1,0 +1,6 @@
+source:
+  url: "https://example.com/customer_churn.csv"
+  format: csv
+
+output:
+  path: data/raw/customer_churn.csv

@@ -1,0 +1,11 @@
+input:
+  path: data/raw/customer_churn.csv
+
+output:
+  path: data/processed/customer_churn.parquet
+
+rules:
+  drop_columns:
+    - customerID
+  fill_na:
+    TotalCharges: 0

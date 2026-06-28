@@ -1,0 +1,73 @@
+stages:
+  # ingest:
+  #   cmd: python src/ingest.py
+  #   outs:
+  #     - data/raw/customer_churn.parquet
+
+  preprocess:
+    cmd: python src/data/preprocess.py
+    deps:
+      - data/raw/customer_churn.csv
+      - src/data/preprocess.py
+    outs:
+      - data/processed/customer_churn.parquet
+
+  feature:
+    cmd: python src/data/feature.py
+    deps:
+      - data/processed/customer_churn.parquet
+      - src/data/feature.py
+      - configs/data/feature.yaml
+    outs:
+      - data/features/feature.parquet
+      - data/features/label.parquet
+
+  split:
+    cmd: python src/data/split.py
+    deps:
+      - data/features/feature.parquet
+      - data/features/label.parquet
+      - src/data/split.py
+      - configs/data/split.yaml
+    outs:
+      - data/split/train_features.parquet
+      - data/split/train_labels.parquet
+      - data/split/val_features.parquet
+      - data/split/val_labels.parquet
+      - data/split/test_features.parquet
+      - data/split/test_labels.parquet
+
+
+  train:
+    cmd: python src/model/train.py
+    deps:
+      - data/split/train_features.parquet
+      - data/split/train_labels.parquet
+      - data/split/val_features.parquet
+      - data/split/val_labels.parquet
+      - src/model/train.py
+    params:
+      - configs/model/train.yaml:
+          - model
+          - training
+          - output
+    outs:
+      - models/model.pkl
+    metrics:
+      - metrics/metrics.json
+    
+  gate:
+    cmd: python src/model/gate.py
+    deps:
+      - metrics/metrics.json
+      - configs/model/validation.yaml
+
+  evaluate:
+    cmd: python src/model/evaluate.py
+    deps:
+      - models/model.pkl
+      - data/split/test_features.parquet
+      - data/split/test_labels.parquet
+      - src/model/evaluate.py
+    metrics:
+      - metrics/test_metrics.json

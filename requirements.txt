@@ -1,0 +1,13 @@
+# MLOps & Tracking
+mlflow==3.14.0
+
+# Data & ML
+pandas>=2.2.0
+numpy>=1.26.0
+scikit-learn>=1.4.0
+
+# Utilities
+pyyaml>=6.0.1
+python-dotenv>=1.0.1
+
+dvc[s3]>=3.67.1

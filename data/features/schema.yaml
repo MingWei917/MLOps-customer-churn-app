@@ -1,0 +1,30 @@
+categorical_features:
+- Contract
+- PaymentMethod
+- InternetService
+- Partner
+- Dependents
+encoded_features:
+- tenure
+- MonthlyCharges
+- SeniorCitizen
+- TotalCharges
+- Contract_Month-to-month
+- Contract_One year
+- Contract_Two year
+- PaymentMethod_Bank transfer
+- PaymentMethod_Credit card
+- PaymentMethod_Electronic check
+- PaymentMethod_Mailed check
+- InternetService_DSL
+- InternetService_Fiber optic
+- InternetService_No
+- Partner_No
+- Partner_Yes
+- Dependents_No
+- Dependents_Yes
+numeric_features:
+- tenure
+- MonthlyCharges
+- SeniorCitizen
+- TotalCharges
