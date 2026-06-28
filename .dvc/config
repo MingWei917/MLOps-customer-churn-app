@@ -1,5 +1,6 @@
 [core]
-    remote = myminio
-['remote "myminio"']
-    url = s3://mlops-customer-churn
-    endpointurl = http://host.docker.internal:30900
+    remote = origin
+['remote "origin"']
+    url = s3://dvc
+    endpointurl = https://dagshub.com/MingWei917/MLOps-customer-churn-app.s3
+    access_key_id = MingWei917
