@@ -56,7 +56,7 @@ jobs:
           
           # Inject DagsHub S3-compatible credentials
           dvc remote modify origin endpointurl $DVC_S3_ENDPOINT_URL
-          dvc remote modify origin access_key_id $DAGSHUB_USERNAME
+          dvc remote modify origin access_key_id $DAGSHUB_TOKEN
           dvc remote modify origin secret_access_key $DAGSHUB_TOKEN
 
       # DagsHub automatically provisions the S3 bucket when the repo is created.
