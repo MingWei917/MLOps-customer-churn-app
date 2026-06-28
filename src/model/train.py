@@ -20,7 +20,8 @@ try:
 except ImportError:
     XGBClassifier = None
 
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://host.docker.internal:30500")
+#MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://host.docker.internal:30500")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
 CFG_PATH = "configs/model/train.yaml"
@@ -83,7 +84,7 @@ def main():
     model_name = model_cfg["name"]
     model_params = model_cfg["params"]
 
-    mlflow.set_experiment("customer_churn")
+    mlflow.set_experiment("customer_churn-v1")
 
     with mlflow.start_run():
         mlflow.set_tags({
