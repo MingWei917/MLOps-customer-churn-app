@@ -117,7 +117,7 @@ def main():
 
         mlflow.sklearn.log_model(
             sk_model=pipeline,
-            artifact_path="model",
+            name="model",
             registered_model_name="customer_churn_model"
         )
 
